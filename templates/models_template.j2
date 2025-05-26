@@ -1,5 +1,5 @@
 {# =========================================================
-   models_template.j2   –  FINAL FIX
+   models_template.j2   –  FINAL FIX + main block
    ========================================================= #}
 
 from datetime import datetime
@@ -10,6 +10,9 @@ from sqlalchemy import (
     PrimaryKeyConstraint, CheckConstraint, text, func, SmallInteger
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+from connection import Connection
+from enumType import EnumType
+from specifiedValue import *
 
 Base = declarative_base()
 
@@ -59,11 +62,11 @@ class {{ model.class_name }}(Base):
     {%- set tbl_parts = [] %}
     {%- for idx in model.indexes %}
         {%- set idx_name = 'ix_' ~ model.table_name ~ ('' if idx|length == 1 else '_' ~ idx | join('_')) %}
-        {%- set cols = '"' ~ (idx | join('", "')) ~ '"' %}
+        {%- set cols = '"' ~ (idx | join('" , "')) ~ '"' %}
         {%- set _ = tbl_parts.append("Index('" ~ idx_name ~ "', " ~ cols ~ ")") %}
     {%- endfor %}
     {%- for uq in model.uniques %}
-        {%- set cols = '"' ~ (uq | join('", "')) ~ '"' %}
+        {%- set cols = '"' ~ (uq | join('" , "')) ~ '"' %}
         {%- set _ = tbl_parts.append("UniqueConstraint(" ~ cols ~ ")") %}
     {%- endfor %}
     __table_args__ = ({{ tbl_parts | join(", ") }},)
@@ -71,3 +74,22 @@ class {{ model.class_name }}(Base):
 
 
 {% endfor %}
+
+# -----------------------------------------------------------------------------
+# Utility: quick rebuild when run directly
+# -----------------------------------------------------------------------------
+
+if __name__ == "__main__":
+
+    # drop table
+    connection = Connection()
+    engine = connection.get_engine()
+    Base.metadata.drop_all(engine)
+
+    # create table
+    Base.metadata.create_all(bind=engine, checkfirst=True)
+
+    # open a throw‑away session
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    session.commit()
