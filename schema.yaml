@@ -1,0 +1,62 @@
+models:
+  - class_name: LineLinkCode
+    table_name: t_line_link_code
+    description: "LINE連携用ワンタイムコード"
+    mapper_args:
+      version_id_col: update_count
+    columns:
+      - name: id
+        type: Integer
+        primary_key: true
+        autoincrement: true
+        comment: サロゲートキー
+      - name: code
+        type: String
+        args: [8]
+        nullable: false
+        unique: true
+        comment: ワンタイムコード
+      - name: company_code
+        type: String
+        args: [10]
+        nullable: false
+        index: true
+        comment: 会社コード
+      - name: employee_code
+        type: String
+        args: [10]
+        nullable: false
+        comment: 従業員番号
+      - name: expires_at
+        type: TIMESTAMP
+        nullable: false
+        comment: LINE連携用ワンタイムコードが使える期限
+      - name: create_date
+        type: TIMESTAMP
+        default: datetime.now
+        nullable: false
+        comment: 作成日時
+      - name: create_employee_code
+        type: String
+        args: [10]
+        nullable: false
+        comment: 作成者従業員コード
+      - name: update_date
+        type: TIMESTAMP
+        default: datetime.now
+        onupdate: datetime.now
+        nullable: false
+        comment: 更新日時
+      - name: update_employee_code
+        type: String
+        args: [10]
+        nullable: false
+        comment: 更新者従業員コード
+      - name: update_count
+        type: Integer
+        nullable: false
+        comment: 更新回数
+    indexes:
+      - ["code"]
+    uniques:
+      - ["code"]
