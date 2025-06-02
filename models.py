@@ -27,11 +27,6 @@ class LineLinkCode(Base):
     update_date = Column('update_date', TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now, comment='更新日時')
     update_employee_code = Column('update_employee_code', String(10, collation='ja_JP.utf8'), nullable=False, comment='更新者従業員コード')
     update_count = Column('update_count', Integer, nullable=False, comment='更新回数')
-
     __mapper_args__ = {
-        'version_id_col': update_count
-    }
-
+        'version_id_col': update_count    }
     __table_args__ = (Index('ix_t_line_link_code', "code"), UniqueConstraint("code"),)
-
-
